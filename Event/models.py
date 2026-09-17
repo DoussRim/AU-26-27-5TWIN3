@@ -24,10 +24,13 @@ class Event(models.Model):
     )
     participant=models.ManyToManyField(
         Person,
-        through='Participants'
+        through='Participants',
+        related_name="participant"
     )
+    def __str__(self):
+        return f"Le titre de l'evt est: {self.title} et la categorie est : {self.category}"
     class Meta:
-        contraints=[
+        constraints=[
             models.CheckConstraint(check=models.Q(
                 evt_date__gt=datetime.now()
             ),name="Please Check event date")

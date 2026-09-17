@@ -14,3 +14,6 @@ class Person(AbstractUser):
     username=models.CharField(max_length=20,unique=True)
     
     USERNAME_FIELD="username"
+    class Meta:
+        #verbose_name="Personne"
+        verbose_name_plural="List of Persons"
