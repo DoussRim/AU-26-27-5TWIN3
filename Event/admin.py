@@ -1,5 +1,5 @@
 from django.contrib import admin,messages
-from Event.models import Event
+from Event.models import *
 from datetime import datetime
 # Register your models here.
 class FilterEvent(admin.SimpleListFilter):
@@ -18,9 +18,21 @@ class FilterEvent(admin.SimpleListFilter):
             return queryset.filter(evt_date__gt=datetime.now())
         if self.value()=='TE':
                     return queryset.filter(evt_date__exact=datetime.now())
-        
+class ParticipantsAdmin(admin.TabularInline):
+    model=Participants
+    extra=1
+    readonly_fields=('participation_date',)
 class EventAdmin(admin.ModelAdmin):
-    list_display=('title','description','category','evt_date','creation_date','update_date','organizer','state')
+    list_display=('title','description','category',
+                  'evt_date','creation_date',
+                  'update_date','organizer',
+                  'list_participant','state')
+    def list_participant(self,obj):
+        names=[p.username for p in obj.participant.all()]
+        result=",".join(names[:1])
+        if not names:
+            return "No Participant!"
+        return result + (f"({+len(names)-1}) more" if len(names)>1 else "") 
     def accept_state(self,request,queryset):
         req=queryset.update(state=True)
         if req==1:
@@ -57,4 +69,5 @@ class EventAdmin(admin.ModelAdmin):
                         }),
     )
     autocomplete_fields=['organizer']
+    inlines=[ParticipantsAdmin]
 admin.site.register(Event,EventAdmin)
